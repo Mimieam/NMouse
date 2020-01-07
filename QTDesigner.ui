@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>NMouse</class>
+ <widget class="QDialog" name="NMouse">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>719</width>
+    <height>258</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>641</width>
+    <height>258</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="spacing">
+    <number>-1</number>
+   </property>
+   <item row="7" column="4">
+    <widget class="QPushButton" name="discoveryBtn">
+     <property name="maximumSize">
+      <size>
+       <width>136</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="mouseTracking">
+      <bool>false</bool>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Start Discovery</string>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="4">
+    <widget class="QPushButton" name="becomeServerBtn">
+     <property name="maximumSize">
+      <size>
+       <width>136</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="mouseTracking">
+      <bool>false</bool>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Become Server</string>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2" rowspan="8">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <widget class="QPushButton" name="addBtn">
+     <property name="maximumSize">
+      <size>
+       <width>136</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Add</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3" rowspan="8">
+    <widget class="QListView" name="listOfNodes">
+     <property name="minimumSize">
+      <size>
+       <width>144</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>153</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="4">
+    <widget class="QPushButton" name="disconnectBtn">
+     <property name="maximumSize">
+      <size>
+       <width>136</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Disconnect</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="4">
+    <widget class="QPushButton" name="connectBtn">
+     <property name="maximumSize">
+      <size>
+       <width>136</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Connect</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QLabel" name="nodeType">
+     <property name="maximumSize">
+      <size>
+       <width>78</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Type : Client</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="nodeID">
+     <property name="maximumSize">
+      <size>
+       <width>147</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Node ID : #123</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" rowspan="8" colspan="2">
+    <widget class="QPlainTextEdit" name="debugArea">
+     <property name="minimumSize">
+      <size>
+       <width>302</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
