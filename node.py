@@ -26,10 +26,10 @@ PUB_SUB_PORT = 5556
 # logger = logging.LoggerAdapter(logger, extra)
 
 
-_id = f"Node-{str(uuid.uuid4())[:4]}"
+NODE_ID = f"Node-{str(uuid.uuid4())[:4]}"
 
 
-def upd_server_discovery(addr='255.255.255.255', port=5563, every=3):
+def udp_server_discovery(addr='255.255.255.255', port=5563, every=3):
     server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -37,7 +37,7 @@ def upd_server_discovery(addr='255.255.255.255', port=5563, every=3):
     # indefinitely when trying to receive data.
     server.settimeout(False)
     start_time = time.time()
-    message =  bytes(f"SERVER ON - {_id}", 'utf-8')
+    message =  bytes(f"SERVER ON - {NODE_ID}", 'utf-8')
     while True:
         elapsed_time = time.time() - start_time
         logger.debug(f"message = {message}, {(addr, port)}")
@@ -79,29 +79,28 @@ def udp_client_discovery(port=5563, timeout=30, every=3):
             if addr:
                 found.append(addr)
         except BlockingIOError as e:
-            logger.info(f"{_id} >> looking for Server ... [UDP]")
+            logger.info(f"{NODE_ID} >> looking for Server ... [UDP]")
         finally:
             elapsed_time_str = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
-            logger.info(f"{_id} -- elapsed time = {elapsed_time_str}")
+            logger.info(f"{NODE_ID} -- elapsed time = {elapsed_time_str}")
             if timeout and elapsed_time > timeout:
-                logger.warning(f"{_id} >> timeout")
+                logger.warning(f"{NODE_ID} >> timeout")
                 return found
         time.sleep(every)
                 
         
 
 def start_as_server():
-    def _broadcast_identity(_q=None, every=3):
-        logger.info(f"[{threading.current_thread().getName()}]-{_id} >> Broadcasting...: I'm The Server ")
-        upd_server_discovery(every=every)
+    def _broadcastNODE_IDentity(_q=None, every=3):
+        logger.info(f"[{threading.current_thread().getName()}]-{NODE_ID} >> Broadcasting...: I'm The Server ")
+        udp_server_discovery(every=every)
              
+    logger.info(f"{NODE_ID} -- Initializing new Server")
+    logger.info(f"{NODE_ID} -- Setting up PUBLISHER on New Thread")
 
-    logger.info(f"{_id} -- Initializing new Server")
-    logger.info(f"{_id} -- Setting up PUBLISHER on New Thread")
-
-    pub_thread = threading.Thread(target=_broadcast_identity)
+    pub_thread = threading.Thread(target=_broadcastNODE_IDentity)
     # pub_thread.daemon=True
-    logger.info(f"[{threading.current_thread().getName()}]{_id} -- continiously broadcast That I'm the server unless i receive a TAKEOVER msg")
+    logger.info(f"[{threading.current_thread().getName()}]{NODE_ID} -- continiously broadcast That I'm the server unless i receive a TAKEOVER msg")
     pub_thread.start()
     # Prepare our context and sockets
     context = zmq.Context()
@@ -112,7 +111,7 @@ def start_as_server():
     
     every = 3
     while True:
-        logger.info(f"[{threading.current_thread().getName()}]-{_id} >> Broadcasting...: I'm The Server ")
+        logger.info(f"[{threading.current_thread().getName()}]-{NODE_ID} >> Broadcasting...: I'm The Server ")
         time.sleep(every)
         logger.info('waiting got something? ->')
             # wait for synchronization request
@@ -155,63 +154,50 @@ def setup_pub_sub_socket(isServer, server_addr='', server_port=''):
 #     start_time = time.time()
 #     anyRes = []
 #     while not anyRes:
-#         logger.info(f"{_id} >> broadcasting and sleeping for 5 sec")
-#         upd_server_discovery()
-#         logger.info(f"{_id} << received anything ? {anyRes}")
+#         logger.info(f"{NODE_ID} >> broadcasting and sleeping for 5 sec")
+#         udp_server_discovery()
+#         logger.info(f"{NODE_ID} << received anything ? {anyRes}")
 #         elapsed_time = time.time() - start_time
 #         elapsed_time_str = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
-#         logger.info(f"{_id} -- elapsed time = {elapsed_time_str}")
+#         logger.info(f"{NODE_ID} -- elapsed time = {elapsed_time_str}")
 #         if timeout and elapsed_time > timeout:
-#             logger.info(f"{_id} >> Done Broadcasting - no server found")
+#             logger.info(f"{NODE_ID} >> Done Broadcasting - no server found")
 #             return anyRes
 #         time.sleep(5)
 #     return anyRes
 
 
 def start(progress_callback):
-    logger.info(f"{_id} Started")
+    logger.info(f"{NODE_ID} Started")
     
     progress_callback.emit(0*100/4)
     disc_timeout = int(sys.argv) if  len(sys.argv) > 1 and sys.argv[1] else 3
     found = udp_client_discovery(timeout=disc_timeout)
     progress_callback.emit(2*100/4)
     if found:
-        logger.warning(f"{_id} >> a server was found - Setting up pub/sub to {found}")
+        logger.warning(f"{NODE_ID} >> a server was found - Setting up pub/sub to {found}")
         [(server_addr, port)] = found
         progress_callback.emit(4*100/4)
         start_as_client(server_addr)
     else:
         progress_callback.emit(4*100/4)
-        logger.warning(f"{_id} -- No Server Found -- Initializing new Server")
+        logger.warning(f"{NODE_ID} -- No Server Found -- Initializing new Server")
         start_as_server()
         # initialize_new_server()
 
 if __name__ == "__main__":
-    # from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
-    # app = QApplication([])
-    # window = QWidget()
-    # layout = QVBoxLayout()
-    # layout.addWidget(QPushButton('Top'))
-    # layout.addWidget(QPushButton('Bottom'))
-    # window.setLayout(layout)
-    # window.show()
-    # app.exec_()
     
-    # print(app)
-    # print(window)
-
-
-    logger.info(f"{_id} Started")
+    logger.info(f"{NODE_ID} Started")
     
     disc_timeout = int(sys.argv) if  len(sys.argv) > 1 and sys.argv[1] else 3
     found = udp_client_discovery(timeout=disc_timeout)
 
     if found:
-        logger.warning(f"{_id} >> a server was found - Setting up pub/sub to {found}")
+        logger.warning(f"{NODE_ID} >> a server was found - Setting up pub/sub to {found}")
         [(server_addr, port)] = found
         start_as_client(server_addr)
     else:
-        logger.warning(f"{_id} -- No Server Found -- Initializing new Server")
+        logger.warning(f"{NODE_ID} -- No Server Found -- Initializing new Server")
         start_as_server()
         # initialize_new_server()
         

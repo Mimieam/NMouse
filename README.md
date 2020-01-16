@@ -13,3 +13,6 @@ Sharing Mouse pointer Accross Computer
     https://github.com/SavinaRoja/PyUserInput
 
 Alberta PNP AINP
+
+city of calgary jobs
+amazon canada

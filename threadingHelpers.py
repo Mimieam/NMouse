@@ -16,7 +16,9 @@ class QtHandler(logging.Handler):
     def emit(self, record):
         try:
             msg = self.format(record)
-            self.widget.appendPlainText(msg)       
+            print(f"emiting: {msg}")
+            self.widget.appendPlainText(msg)
+
         except:
             print("something bad happened")
 
@@ -29,7 +31,7 @@ def setup_logs(logger, output_widget=None):
 logger = logging.getLogger(__name__)
 # to console
 syslog = logging.StreamHandler()
-formatter = logging.Formatter('[%(asctime)s.%(msecs)03d %(threadName)10s] -- %(funcName)20s() ->%(levelname)5s: %(message)s',"%H:%M:%S")
+formatter = logging.Formatter('[%(asctime)s.%(msecs)03d %(threadName)10s] -- %(funcName)20s() -> %(levelname)5s: %(message)s',"%H:%M:%S")
 syslog.setFormatter(formatter)
 logger.addHandler(syslog)
 
@@ -84,10 +86,9 @@ class Worker(QRunnable):
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
-        self.signals = WorkerSignals()    
-
+        self.signals = WorkerSignals()
         # Add the callback to our kwargs
-        self.kwargs['progress_callback'] = self.signals.progress        
+        # self.kwargs['progress_callback'] = self.signals.progress        
 
     @pyqtSlot()
     def run(self):

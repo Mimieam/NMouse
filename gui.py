@@ -7,7 +7,7 @@ import time
 import traceback, sys
 
 from threadingHelpers import WorkerSignals, Worker, logger,setup_logs
-from node import start
+from node import start, NODE_ID
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType("QTDesigner.ui")
 
@@ -20,6 +20,8 @@ BUTTON_MAP = {
     'becomeServerBtn': 'becomeMainServerFn'
 }
 
+FN_MEMOIZED = []
+
 class MainWindow(Ui_MainWindow, QtBaseClass):
 
     def __init__(self, *args, **kwargs):
@@ -27,6 +29,10 @@ class MainWindow(Ui_MainWindow, QtBaseClass):
         # super(QtBaseClass, self).__init__(*args, **kwargs)
         self.setupUi(self)
         self.setupButtons()
+
+        # NODE_ID
+        
+        self.nodeID.setText(f"ID: {NODE_ID}")
 
         setup_logs(logger, self.debugArea)
         self.show()
@@ -72,14 +78,20 @@ class MainWindow(Ui_MainWindow, QtBaseClass):
         self.printToScreen(f'becomeMainServerFn called')
 
     def startOnNewThread(self, fn):
-        # Pass the function to execute
-        worker = Worker(fn) # Any other args, kwargs are passed to the run function
-        worker.signals.result.connect(self.print_output)
-        worker.signals.finished.connect(self.thread_complete)
-        worker.signals.progress.connect(self.progress_fn)
-        
-        # Execute
-        self.threadpool.start(worker) 
+        if fn.__name__ not in FN_MEMOIZED:
+            # Pass the function to execute
+            worker = Worker(fn) # Any other args, kwargs are passed to the run function
+            worker.signals.result.connect(self.print_output)
+            worker.signals.finished.connect(self.thread_complete)
+            worker.signals.progress.connect(self.progress_fn)
+            
+            # Execute
+            self.threadpool.start(worker)
+            # FN_MEMOIZED.append(fn.__name__)
+            
+
+        else:
+            logger.warning("Triggering multiple thread for the same function is diseabled")
 
     
 
