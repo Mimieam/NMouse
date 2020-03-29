@@ -183,10 +183,8 @@ class NetNode(object):
 		# self.com_link.send(b'Client ==> Hello')
 		# msg = self.com_link.recv()
 		# msg = self.com_link.recv_multipart()
-		logger.debug(self.com_link)
-		logger.debug(self)
 		self.com_link.send(f"{msg}".encode('utf-8'))
-		# logger.debug(f"[{self._id}] Sending=> {msg}")
+		logger.debug(f"[{self._id}] Sending=> {msg}")
 
 	def listen(self):
 

@@ -76,6 +76,7 @@ class MainWindow(Ui_MainWindow, QtBaseClass):
         self.startOnNewThread(start)
     def becomeMainServerFn(self, nodeId=None): 
         self.printToScreen(f'becomeMainServerFn called')
+        self.becomeServer()
 
     def startOnNewThread(self, fn):
         if fn.__name__ not in FN_MEMOIZED:
@@ -84,19 +85,29 @@ class MainWindow(Ui_MainWindow, QtBaseClass):
             worker.signals.result.connect(self.print_output)
             worker.signals.finished.connect(self.thread_complete)
             worker.signals.progress.connect(self.progress_fn)
+            print("starting Threadpool")
             
+            # this because we start was isolated and it needs 
+            worker.fn = start
+            worker.args = [worker]
+
             # Execute
             self.threadpool.start(worker)
             # FN_MEMOIZED.append(fn.__name__)
-            
 
         else:
             logger.warning("Triggering multiple thread for the same function is diseabled")
 
-    
+class API():
+    def __init__(self):pass
+    def start(self):pass
+    def stop(self): pass
+    def connect(self): pass
+   
 
 app = QApplication([])
 window = MainWindow()
+window.startDiscoveryFn()
 app.exec_() 
 
 

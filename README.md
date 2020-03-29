@@ -16,3 +16,6 @@ Alberta PNP AINP
 
 city of calgary jobs
 amazon canada
+
+Experience with machine learning frameworks such as Caffe, TensorFlow, Keras, PyTorch, ONNX
+Experience working with neural network models such as CNNs, RNN/LSTM, Transformer, NMT

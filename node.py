@@ -20,16 +20,17 @@ XREQ_XREP_PORT = 5562
 # PUB/SUB
 PUB_SUB_PORT = 5556
 
-# extra = {'type':'Super App'}
+POOL = {
+    "server_thread": None,
+    "clients": []
+}
 
-
-# logger = logging.LoggerAdapter(logger, extra)
 
 
 NODE_ID = f"Node-{str(uuid.uuid4())[:4]}"
 
 
-def udp_server_discovery(addr='255.255.255.255', port=5563, every=3):
+def udp_server_discovery(addr='255.255.255.255', port=UDP_PORT, every=3):
     server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -51,7 +52,7 @@ def udp_server_discovery(addr='255.255.255.255', port=5563, every=3):
             pass
         time.sleep(every)
 
-def udp_client_discovery(port=5563, timeout=30, every=3):
+def udp_client_discovery(port=UDP_PORT, timeout=30, every=3):
     client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) # UDP
     # client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     # client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -107,9 +108,12 @@ def start_as_server():
 
     syncservice = context.socket(zmq.XREP)
     syncservice.bind('tcp://*:5562')
-    logger.info("start_as_server")
+    logger.info("START_AS_SERVER")
     
-    every = 3
+    
+    POOL["server_thread"] = pub_thread
+
+    every = 10
     while True:
         logger.info(f"[{threading.current_thread().getName()}]-{NODE_ID} >> Broadcasting...: I'm The Server ")
         time.sleep(every)
@@ -149,38 +153,24 @@ def setup_pub_sub_socket(isServer, server_addr='', server_port=''):
         logger.info("PUB/SUB set up")
         socket.setsockopt_string(zmq.SUBSCRIBE, "")
 
-# # tcp broadcast that i'm here
-# def broadcast(msg='', timeout=None):
-#     start_time = time.time()
-#     anyRes = []
-#     while not anyRes:
-#         logger.info(f"{NODE_ID} >> broadcasting and sleeping for 5 sec")
-#         udp_server_discovery()
-#         logger.info(f"{NODE_ID} << received anything ? {anyRes}")
-#         elapsed_time = time.time() - start_time
-#         elapsed_time_str = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
-#         logger.info(f"{NODE_ID} -- elapsed time = {elapsed_time_str}")
-#         if timeout and elapsed_time > timeout:
-#             logger.info(f"{NODE_ID} >> Done Broadcasting - no server found")
-#             return anyRes
-#         time.sleep(5)
-#     return anyRes
 
-
-def start(progress_callback):
+def start(worker):
     logger.info(f"{NODE_ID} Started")
+
+    # progress_callback = worker.signals.progress
     
-    progress_callback.emit(0*100/4)
+    # progress_callback.emit(0*100/4)
     disc_timeout = int(sys.argv) if  len(sys.argv) > 1 and sys.argv[1] else 3
     found = udp_client_discovery(timeout=disc_timeout)
-    progress_callback.emit(2*100/4)
+    # progress_callback.emit(2*100/4)
     if found:
         logger.warning(f"{NODE_ID} >> a server was found - Setting up pub/sub to {found}")
         [(server_addr, port)] = found
-        progress_callback.emit(4*100/4)
-        start_as_client(server_addr)
+        # progress_callback.emit(4*100/4)
+        # start_as_client(server_addr)
+        setup_pub_sub_socket(server_addr)
     else:
-        progress_callback.emit(4*100/4)
+        # progress_callback.emit(4*100/4)
         logger.warning(f"{NODE_ID} -- No Server Found -- Initializing new Server")
         start_as_server()
         # initialize_new_server()
